@@ -30,6 +30,8 @@ try:
         img_str = re.search(r'base64,(.*)', data).group(1)
         image_bytes = io.BytesIO(base64.b64decode(img_str))
         im = Image.open(image_bytes)
+        # Resize image to 28x28
+        im = im.resize((28,28))
         arr = np.array(im)[:,:,0:1]
 
         # Normalize and invert pixel values
@@ -59,10 +61,10 @@ try:
         print("max ", max(results), file=sys.stderr)
         maxpos = results.index(max(results))
 
-        r2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        r2[maxpos] = 1;
-
-        res['data'] = r2
+        # Normalise result data
+        probs = [x/max(results) for x in results]
+        print("probabilities: : ", probs, file=sys.stderr)
+        res['data'] = probs
         print("done: ", res, file=sys.stderr)
 
 except Exception as e:
